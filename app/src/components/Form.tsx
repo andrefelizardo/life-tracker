@@ -1,7 +1,20 @@
-export default function Form() {
+import { useState } from "react";
+
+interface FormProps {
+  onSubmit: (name: string) => void;
+}
+
+export default function Form({ onSubmit }: FormProps) {
+  const [name, setName] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(name);
+  };
+
   return (
     <div className="container w-full">
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-sm font-bold mb-2" htmlFor="name">
             Name
@@ -11,10 +24,12 @@ export default function Form() {
             id="name"
             type="text"
             placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
         </div>
         <button
-          className="bg-blue-500 text-white p-2 rounded w-full"
+          className="mt-4 bg-orange text-white p-2 rounded w-full"
           type="submit"
         >
           Add Habit

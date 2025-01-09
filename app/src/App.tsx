@@ -30,6 +30,28 @@ function App() {
     fetchHabits();
   }, []);
 
+  const addHabit = async (name: string) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/habits`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, qtt: 0 }),
+        }
+      );
+      if (response.ok) {
+        const newHabit = await response.json();
+        setHabits((prevHabits) => [...prevHabits, newHabit.data]);
+        setShowForm(false);
+      }
+    } catch (error) {
+      console.error("Error adding habit:", error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen animate-fade-in">
@@ -50,12 +72,12 @@ function App() {
       {showForm && (
         <div className="fixed inset-0 bg-black w-full h-full text-white flex justify-center items-center">
           <div className="p-16 rounded-lg shadow-lg w-full h-full items-center justify-center flex flex-col">
-            <Form />
+            <Form onSubmit={addHabit} />
             <button
-              className="mt-4 bg-red-500 text-white p-2 rounded"
+              className="mt-4 bg-orange text-white p-4 rounded-full absolute top-4 right-4 leading-none"
               onClick={() => setShowForm(false)}
             >
-              Close
+              X
             </button>
           </div>
         </div>
