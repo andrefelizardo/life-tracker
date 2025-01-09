@@ -9,7 +9,9 @@ function App() {
   useEffect(() => {
     const fetchHabits = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/habits");
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/habits`
+        );
         const data = await response.json();
         setHabits(data.data.habits);
       } catch (error) {
