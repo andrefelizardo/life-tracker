@@ -24,3 +24,9 @@ dist-ssr
 *.sw?
 
 .env
+
+*dev.db
+*dev.db-journal
+
+# Prisma migrations
+prisma/migrations/

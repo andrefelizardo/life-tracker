@@ -1,41 +1,25 @@
 import "./App.css";
 import Card from "./components/Card";
 import { Habit } from "./types/habits";
-
-const habits: Habit[] = [
-  {
-    id: 1,
-    name: "Secso",
-    qtt: 1,
-  },
-  {
-    id: 2,
-    name: "Correr",
-    qtt: 0,
-  },
-  {
-    id: 3,
-    name: "Video-game",
-    qtt: 3,
-  },
-  {
-    id: 4,
-    name: "Beber álcool",
-    qtt: 1,
-  },
-  {
-    id: 5,
-    name: "Lugar novo",
-    qtt: 3,
-  },
-  {
-    id: 6,
-    name: "Encontrar pessoas",
-    qtt: 2,
-  },
-];
+import { useEffect, useState } from "react";
 
 function App() {
+  const [habits, setHabits] = useState<Habit[]>([]);
+
+  useEffect(() => {
+    const fetchHabits = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/habits");
+        const data = await response.json();
+        setHabits(data.data.habits);
+      } catch (error) {
+        console.error("Error fetching habits:", error);
+      }
+    };
+
+    fetchHabits();
+  }, []);
+
   return (
     <>
       <h1 className="text-3xl font-bold underline">Lista de coisas</h1>
