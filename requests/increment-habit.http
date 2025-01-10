@@ -1,0 +1,3 @@
+PATCH http://localhost:3000/api/habits/1/increment
+Host: localhost:3000
+Content-Type: application/json

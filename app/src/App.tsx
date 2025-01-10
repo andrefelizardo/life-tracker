@@ -52,6 +52,27 @@ function App() {
     }
   };
 
+  const incrementHabit = async (id: number) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/habits/${id}/increment`,
+        {
+          method: "PATCH",
+        }
+      );
+      if (response.ok) {
+        const updatedHabit = await response.json();
+        setHabits((prevHabits) =>
+          prevHabits.map((habit) =>
+            habit.id === id ? updatedHabit.data : habit
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error incrementing habit:", error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen animate-fade-in">
@@ -65,7 +86,7 @@ function App() {
       <h1 className="text-3xl font-bold underline">Life Tracker</h1>
       <ul className="mt-8 grid gap-6 grid-cols-2 auto-rows-[1fr]">
         {habits.map((habit) => (
-          <Card key={habit.id} habit={habit} />
+          <Card key={habit.id} habit={habit} onIncrement={incrementHabit} />
         ))}
       </ul>
       <FabButton onClick={() => setShowForm(true)} />

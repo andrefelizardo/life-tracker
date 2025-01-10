@@ -7,7 +7,11 @@ router
   .route("/habits")
   .get(async (req, res) => {
     try {
-      const habits = await prisma.habit.findMany();
+      const habits = await prisma.habit.findMany({
+        orderBy: {
+          id: "asc",
+        },
+      });
       res.status(200).json({
         status: "success",
         data: {
@@ -41,5 +45,29 @@ router
       });
     }
   });
+
+router.patch("/habits/:id/increment", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedHabit = await prisma.habit.update({
+      where: { id: parseInt(id) },
+      data: {
+        qtt: {
+          increment: 1,
+        },
+      },
+    });
+    res.status(200).json({
+      status: "success",
+      data: updatedHabit,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+});
 
 module.exports = router;
