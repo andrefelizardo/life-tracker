@@ -55,6 +55,7 @@ router.patch("/habits/:id/increment", async (req, res) => {
         qtt: {
           increment: 1,
         },
+        lastIncrementedAt: new Date(),
       },
     });
     res.status(200).json({
