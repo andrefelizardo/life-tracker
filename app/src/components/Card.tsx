@@ -13,8 +13,8 @@ export default function Card({ habit, onIncrement }: Props) {
     >
       <div className="flex flex-col justify-between w-full h-full">
         <p className="text-gray-light text-lg">{habit.name}</p>
-        <p className="text-gray-light">{habit.qtt}</p>
-        <p className="text-gray-light text-sm">
+        <p className="text-gray-light mt-3 font-bold">{habit.qtt}</p>
+        <p className="text-gray-light text-xs mt-3">
           Last:{" "}
           {habit.lastIncrementedAt
             ? new Date(habit.lastIncrementedAt).toLocaleString("pt-BR", {
