@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prisma:generate": "prisma generate",
     "build": "npm run prisma:generate && tsc",
-    "start": "node index.js"
+    "start": "node dist/index.js"
   },
   "author": "André Felizardo",
   "license": "ISC",

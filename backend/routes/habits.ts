@@ -1,9 +1,8 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../lib/prisma';
 import { AuthRequest } from '../middleware';
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 router
     .route("/habits")
