@@ -20,7 +20,7 @@ export default function Form({ onSubmit }: FormProps) {
             Name
           </label>
           <input
-            className="w-full p-2 border border-gray-300 rounded"
+            className="w-full p-2 border border-gray-300 rounded text-gray-900 dark:text-white bg-white dark:bg-gray-800"
             id="name"
             type="text"
             placeholder="Name"
