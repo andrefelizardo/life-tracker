@@ -12,12 +12,16 @@ datasource db {
 }
 
 model Habit {
-  id Int @id @default(autoincrement())
-  name String
-  qtt Int
+  id                Int       @id @default(autoincrement())
+  name              String
+  qtt               Int
+  goal              Int       @default(0)
+  mode              String    @default("NORMAL") // "NORMAL", "ON", "OFF"
+  resetOnFailure    Boolean   @default(false)
+  startDate         DateTime? @default(now())
   lastIncrementedAt DateTime? @default(now())
-  userId Int?
-  user User? @relation(fields: [userId], references: [id])
+  userId            Int?
+  user              User?     @relation(fields: [userId], references: [id])
 }
 
 model User {
