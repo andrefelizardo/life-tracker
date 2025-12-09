@@ -43,7 +43,7 @@ const Dashboard: React.FC = () => {
         }
     }, [token, logout]);
 
-    const addHabit = async (name: string) => {
+    const addHabit = async (name: string, goal?: number, mode?: "NORMAL" | "ON" | "OFF", resetOnFailure?: boolean) => {
         try {
             const response = await fetch(
                 `${import.meta.env.VITE_API_URL}/api/habits`,
@@ -53,7 +53,7 @@ const Dashboard: React.FC = () => {
                         "Content-Type": "application/json",
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ name, qtt: 0 }),
+                    body: JSON.stringify({ name, qtt: 0, goal, mode, resetOnFailure }),
                 }
             );
             if (response.ok) {
@@ -63,6 +63,30 @@ const Dashboard: React.FC = () => {
             }
         } catch (error) {
             console.error("Error adding habit:", error);
+        }
+    };
+
+    const failHabit = async (id: number) => {
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/habits/${id}/fail`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+            if (response.ok) {
+                const updatedHabit = await response.json();
+                setHabits((prevHabits) =>
+                    prevHabits.map((habit) =>
+                        habit.id === id ? updatedHabit.data : habit
+                    )
+                );
+            }
+        } catch (error) {
+            console.error("Error failing habit:", error);
         }
     };
 
@@ -112,7 +136,7 @@ const Dashboard: React.FC = () => {
 
             <ul className="grid gap-6 grid-cols-2 auto-rows-[1fr] px-4">
                 {habits.map((habit) => (
-                    <Card key={habit.id} habit={habit} onIncrement={incrementHabit} />
+                    <Card key={habit.id} habit={habit} onIncrement={incrementHabit} onFailure={failHabit} />
                 ))}
             </ul>
             <FabButton onClick={() => setShowForm(true)} />
