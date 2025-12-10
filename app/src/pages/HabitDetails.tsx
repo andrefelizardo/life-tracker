@@ -293,7 +293,7 @@ export default function HabitDetails({ habit, onIncrement, onFailure, onDelete, 
                                 : '✓ Marcar como feito hoje'}
                     </button>
 
-                    {habit.resetOnFailure && !isCompleted && !isOffMode && (
+                    {habit.resetOnFailure && !isCompleted && (
                         <button
                             onClick={handleFailure}
                             className="w-full text-red-600 hover:text-red-700 text-sm font-medium transition-colors"
