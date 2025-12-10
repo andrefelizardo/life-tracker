@@ -173,15 +173,16 @@ router.delete("/habits/:id", async (req: any, res: any) => {
     }
     try {
         const { id } = req.params;
-        // Verify ownership
-        const habit = await prisma.habit.findUnique({ where: { id: parseInt(id) } });
-        if (!habit || habit.userId !== authReq.user.userId) {
+        // Atomic delete with ownership check
+        const deleteResult = await prisma.habit.deleteMany({
+            where: {
+                id: parseInt(id),
+                userId: authReq.user.userId,
+            },
+        });
+        if (deleteResult.count === 0) {
             return res.status(404).json({ message: 'Habit not found' });
         }
-
-        await prisma.habit.delete({
-            where: { id: parseInt(id) },
-        });
         res.status(200).json({
             status: "success",
             message: "Habit deleted successfully",
