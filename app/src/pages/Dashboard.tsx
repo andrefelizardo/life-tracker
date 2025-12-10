@@ -108,6 +108,7 @@ const Dashboard: React.FC = () => {
                     }
                 }
             );
+
             if (response.ok) {
                 const updatedHabit = await response.json();
                 setHabits((prevHabits) =>
@@ -116,12 +117,19 @@ const Dashboard: React.FC = () => {
                     )
                 );
                 // Update selected habit if it's the one being modified
-                if (selectedHabit?.id === id) {
+                if (selectedHabit && selectedHabit.id === id) {
                     setSelectedHabit(updatedHabit.data);
                 }
+            } else {
+                // Throw error with response data for handling in HabitDetails
+                const errorData = await response.json();
+                const error: any = new Error(errorData.message);
+                error.response = { data: errorData };
+                throw error;
             }
         } catch (error) {
             console.error("Error incrementing habit:", error);
+            throw error; // Re-throw for HabitDetails to handle
         }
     };
 
@@ -229,6 +237,7 @@ const Dashboard: React.FC = () => {
                     habit={selectedHabit}
                     onIncrement={incrementHabit}
                     onFailure={failHabit}
+                    onDelete={deleteHabit}
                     onClose={() => setSelectedHabit(null)}
                 />
             )}
