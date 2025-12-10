@@ -10,6 +10,7 @@ type Props = {
 export default function ProgressBubble({ habit, onClick, onLongPress }: Props) {
     const [isPressed, setIsPressed] = useState(false);
     const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+    const longPressTriggered = useRef(false);
 
     // Calculate progress
     const daysCompleted = habit.qtt;
@@ -93,7 +94,9 @@ export default function ProgressBubble({ habit, onClick, onLongPress }: Props) {
     // Long press handlers
     const handleTouchStart = () => {
         setIsPressed(true);
+        longPressTriggered.current = false;
         longPressTimer.current = setTimeout(() => {
+            longPressTriggered.current = true;
             onLongPress();
             setIsPressed(false);
         }, 500);
@@ -103,7 +106,7 @@ export default function ProgressBubble({ habit, onClick, onLongPress }: Props) {
         if (longPressTimer.current) {
             clearTimeout(longPressTimer.current);
         }
-        if (isPressed) {
+        if (isPressed && !longPressTriggered.current) {
             onClick();
         }
         setIsPressed(false);
@@ -111,7 +114,9 @@ export default function ProgressBubble({ habit, onClick, onLongPress }: Props) {
 
     const handleMouseDown = () => {
         setIsPressed(true);
+        longPressTriggered.current = false;
         longPressTimer.current = setTimeout(() => {
+            longPressTriggered.current = true;
             onLongPress();
             setIsPressed(false);
         }, 500);
@@ -121,7 +126,7 @@ export default function ProgressBubble({ habit, onClick, onLongPress }: Props) {
         if (longPressTimer.current) {
             clearTimeout(longPressTimer.current);
         }
-        if (isPressed) {
+        if (isPressed && !longPressTriggered.current) {
             onClick();
         }
         setIsPressed(false);
