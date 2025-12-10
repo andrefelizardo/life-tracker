@@ -131,4 +131,34 @@ router.patch("/habits/:id/fail", async (req: any, res: any) => {
     }
 });
 
+router.delete("/habits/:id", async (req: any, res: any) => {
+    const authReq = req as AuthRequest;
+    if (!authReq.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    try {
+        const { id } = req.params;
+        // Verify ownership
+        const habit = await prisma.habit.findUnique({ where: { id: parseInt(id) } });
+        if (!habit || habit.userId !== authReq.user.userId) {
+            return res.status(404).json({ message: 'Habit not found' });
+        }
+
+        await prisma.habit.delete({
+            where: { id: parseInt(id) },
+        });
+        res.status(200).json({
+            status: "success",
+            message: "Habit deleted successfully",
+        });
+    } catch (error: any) {
+        console.log(error);
+        res.status(500).json({
+            status: "error",
+            message: error.message,
+        });
+    }
+});
+
 export default router;
+
