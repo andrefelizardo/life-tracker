@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Card from "../components/Card";
+import ProgressBubble from "../components/ProgressBubble";
+import ContextMenu from "../components/ContextMenu";
+import HabitDetails from "./HabitDetails";
 import FabButton from "../components/FabButton";
 import Form from "../components/Form";
 import { Habit } from "../types/habits";
@@ -10,6 +12,8 @@ const Dashboard: React.FC = () => {
     const [habits, setHabits] = useState<Habit[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
+    const [contextMenuHabit, setContextMenuHabit] = useState<Habit | null>(null);
     const { token, logout, user } = useAuth();
 
     useEffect(() => {
@@ -53,7 +57,7 @@ const Dashboard: React.FC = () => {
                         "Content-Type": "application/json",
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ name, qtt: 0, goal, mode, resetOnFailure }),
+                    body: JSON.stringify({ name, qtt: 0, goal: goal || 100, mode, resetOnFailure }),
                 }
             );
             if (response.ok) {
@@ -84,6 +88,10 @@ const Dashboard: React.FC = () => {
                         habit.id === id ? updatedHabit.data : habit
                     )
                 );
+                // Update selected habit if it's the one being modified
+                if (selectedHabit?.id === id) {
+                    setSelectedHabit(updatedHabit.data);
+                }
             }
         } catch (error) {
             console.error("Error failing habit:", error);
@@ -108,10 +116,54 @@ const Dashboard: React.FC = () => {
                         habit.id === id ? updatedHabit.data : habit
                     )
                 );
+                // Update selected habit if it's the one being modified
+                if (selectedHabit?.id === id) {
+                    setSelectedHabit(updatedHabit.data);
+                }
             }
         } catch (error) {
             console.error("Error incrementing habit:", error);
         }
+    };
+
+    const deleteHabit = async (id: number) => {
+        if (!confirm('Tem certeza que deseja deletar este hábito?')) return;
+
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/habits/${id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+            if (response.ok) {
+                setHabits((prevHabits) => prevHabits.filter((habit) => habit.id !== id));
+            }
+        } catch (error) {
+            console.error("Error deleting habit:", error);
+        }
+    };
+
+    const restartHabit = async (id: number) => {
+        if (!confirm('Tem certeza que deseja reiniciar este desafio?')) return;
+
+        // Use the fail endpoint to reset the habit
+        await failHabit(id);
+    };
+
+    // Calculate summary statistics
+    const activeChallenges = habits.length;
+    const accumulatedDays = habits.reduce((sum, habit) => sum + habit.qtt, 0);
+
+    // Get greeting based on time of day
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Bom dia';
+        if (hour < 18) return 'Boa tarde';
+        return 'Boa noite';
     };
 
     if (loading) {
@@ -124,22 +176,46 @@ const Dashboard: React.FC = () => {
 
     return (
         <div className="animate-fade-in relative min-h-screen pb-20">
-            <div className="flex justify-between items-center mb-8 pt-4 px-4">
+            {/* Header */}
+            <div className="flex justify-between items-start mb-6 pt-6 px-6">
                 <div>
-                    <h1 className="text-3xl font-bold underline">Life Tracker</h1>
-                    <p className="text-sm text-gray-500">Welcome, {user?.displayName}</p>
+                    <h1 className="text-3xl font-bold text-white mb-1">
+                        {getGreeting()}, {user?.displayName?.split(' ')[0] || 'Usuário'} 👋
+                    </h1>
+                    <p className="text-gray-400 text-sm">
+                        {activeChallenges} {activeChallenges === 1 ? 'desafio ativo' : 'desafios ativos'} | {accumulatedDays} dias acumulados
+                    </p>
                 </div>
-                <button onClick={logout} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <LogOut className="w-6 h-6" />
+                <button onClick={logout} className="p-2 rounded-full hover:bg-gray-800 transition-colors">
+                    <LogOut className="w-6 h-6 text-white" />
                 </button>
             </div>
 
-            <ul className="grid gap-6 grid-cols-2 auto-rows-[1fr] px-4">
-                {habits.map((habit) => (
-                    <Card key={habit.id} habit={habit} onIncrement={incrementHabit} onFailure={failHabit} />
-                ))}
-            </ul>
+            {/* Progress Bubbles Grid */}
+            <div className="px-6">
+                {habits.length === 0 ? (
+                    <div className="text-center py-20">
+                        <p className="text-gray-400 text-lg mb-4">Nenhum desafio ativo ainda</p>
+                        <p className="text-gray-500 text-sm">Clique no botão + para criar seu primeiro desafio de 100 dias!</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-8 justify-items-center">
+                        {habits.map((habit) => (
+                            <ProgressBubble
+                                key={habit.id}
+                                habit={habit}
+                                onClick={() => setSelectedHabit(habit)}
+                                onLongPress={() => setContextMenuHabit(habit)}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* FAB Button */}
             <FabButton onClick={() => setShowForm(true)} />
+
+            {/* Add Habit Form Modal */}
             {showForm && (
                 <div className="fixed inset-0 bg-black/80 w-full h-full text-white flex justify-center items-center z-50">
                     <div className="p-8 rounded-lg shadow-lg w-full max-w-md relative bg-gray-900 mx-4">
@@ -152,6 +228,35 @@ const Dashboard: React.FC = () => {
                         </button>
                     </div>
                 </div>
+            )}
+
+            {/* Habit Details Modal */}
+            {selectedHabit && (
+                <HabitDetails
+                    habit={selectedHabit}
+                    onIncrement={incrementHabit}
+                    onFailure={failHabit}
+                    onClose={() => setSelectedHabit(null)}
+                />
+            )}
+
+            {/* Context Menu */}
+            {contextMenuHabit && (
+                <ContextMenu
+                    habitName={contextMenuHabit.name}
+                    canRestart={contextMenuHabit.resetOnFailure || false}
+                    onEdit={() => {
+                        // TODO: Implement edit functionality
+                        alert('Funcionalidade de edição em desenvolvimento');
+                    }}
+                    onPause={() => {
+                        // TODO: Implement pause functionality
+                        alert('Funcionalidade de pausa em desenvolvimento');
+                    }}
+                    onRestart={() => restartHabit(contextMenuHabit.id)}
+                    onDelete={() => deleteHabit(contextMenuHabit.id)}
+                    onClose={() => setContextMenuHabit(null)}
+                />
             )}
         </div>
     );
