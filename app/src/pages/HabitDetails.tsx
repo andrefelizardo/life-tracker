@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Habit } from "../types/habits";
 import { ArrowLeft, Trash2, RotateCcw } from 'lucide-react';
 
@@ -22,6 +22,7 @@ export default function HabitDetails({ habit, onIncrement, onFailure, onDelete, 
     const [showResetMessage, setShowResetMessage] = useState(false);
     const [completions, setCompletions] = useState<HabitCompletion[]>([]);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const messageTimer = useRef<NodeJS.Timeout | null>(null);
 
     const daysCompleted = habit.qtt;
     const totalDays = habit.goal || 100;
@@ -70,6 +71,13 @@ export default function HabitDetails({ habit, onIncrement, onFailure, onDelete, 
 
         fetchCompletions();
     }, [habit.id, habit.qtt]);
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (messageTimer.current) clearTimeout(messageTimer.current);
+        };
+    }, []);
 
     // Determine color based on mode
     const getColor = () => {
@@ -140,7 +148,7 @@ export default function HabitDetails({ habit, onIncrement, onFailure, onDelete, 
     const handleFailure = () => {
         onFailure(habit.id);
         setShowResetMessage(true);
-        setTimeout(() => setShowResetMessage(false), 3000);
+        messageTimer.current = setTimeout(() => setShowResetMessage(false), 3000);
     };
 
     const handleDelete = () => {
