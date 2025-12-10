@@ -1,11 +1,13 @@
+import dotenv from 'dotenv';
+
+// Load environment variables FIRST, before any other imports
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import habitsRoutes from './routes/habits';
 import authRoutes from './routes/auth';
 import { authenticateToken } from './middleware';
-
-dotenv.config();
 
 const app = express();
 
