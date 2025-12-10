@@ -187,7 +187,7 @@ export default function HabitDetails({ habit, onIncrement, onFailure, onDelete, 
                     onClick={onClose}
                     className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
-                    <ArrowLeft className="w-6 h-6" style={{ color: '#222222' }} />
+                    <ArrowLeft className="w-6 h-6" style={{ color: '#ccc' }} />
                 </button>
                 <div className="flex-1" />
             </div>
@@ -197,7 +197,7 @@ export default function HabitDetails({ habit, onIncrement, onFailure, onDelete, 
                 {/* Icon and Title */}
                 <div className="text-center">
                     <div className="text-5xl mb-3">{getEmoji()}</div>
-                    <h1 className="text-2xl font-bold mb-2" style={{ color: '#222222' }}>
+                    <h1 className="text-2xl font-bold mb-2" style={{ color: '#ccc' }}>
                         {habit.name}
                     </h1>
                     <div className="flex gap-2 justify-center">
@@ -254,7 +254,7 @@ export default function HabitDetails({ habit, onIncrement, onFailure, onDelete, 
                     {/* Content inside */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <p className="text-gray-500 text-sm mb-1">DIA ATUAL</p>
-                        <p className="text-5xl font-bold mb-1" style={{ color: '#222222' }}>
+                        <p className="text-5xl font-bold mb-1" style={{ color: '#ccc' }}>
                             {daysCompleted}
                         </p>
                         <p className="text-gray-400 text-lg">/100</p>
@@ -305,7 +305,7 @@ export default function HabitDetails({ habit, onIncrement, onFailure, onDelete, 
 
                 {/* 100-Day Calendar */}
                 <div className="w-full max-w-md">
-                    <h3 className="text-lg font-semibold mb-3 text-center" style={{ color: '#222222' }}>
+                    <h3 className="text-lg font-semibold mb-3 text-center" style={{ color: '#ccc' }}>
                         Histórico (100 dias)
                     </h3>
                     {renderCalendar()}
@@ -313,7 +313,7 @@ export default function HabitDetails({ habit, onIncrement, onFailure, onDelete, 
 
                 {/* Settings */}
                 <div className="w-full max-w-md border-t border-gray-200 dark:border-gray-800 pt-6">
-                    <h3 className="text-lg font-semibold mb-3" style={{ color: '#222222' }}>
+                    <h3 className="text-lg font-semibold mb-3" style={{ color: '#ccc' }}>
                         Configurações
                     </h3>
                     <div className="space-y-2">
