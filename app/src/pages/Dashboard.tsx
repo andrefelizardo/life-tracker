@@ -6,7 +6,6 @@ import FabButton from "../components/FabButton";
 import Form from "../components/Form";
 import { Habit } from "../types/habits";
 import { useAuth } from "../context/AuthContext";
-import { LogOut } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
     const [habits, setHabits] = useState<Habit[]>([]);
@@ -154,18 +153,6 @@ const Dashboard: React.FC = () => {
         await failHabit(id);
     };
 
-    // Calculate summary statistics
-    const activeChallenges = habits.length;
-    const accumulatedDays = habits.reduce((sum, habit) => sum + habit.qtt, 0);
-
-    // Get greeting based on time of day
-    const getGreeting = () => {
-        const hour = new Date().getHours();
-        if (hour < 12) return 'Bom dia';
-        if (hour < 18) return 'Boa tarde';
-        return 'Boa noite';
-    };
-
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen animate-fade-in">
@@ -179,15 +166,21 @@ const Dashboard: React.FC = () => {
             {/* Header */}
             <div className="flex justify-between items-start mb-6 pt-6 px-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-1">
-                        {getGreeting()}, {user?.displayName?.split(' ')[0] || 'Usuário'} 👋
+                    <h1 className="text-2xl font-bold mb-1" style={{ color: '#111111' }}>
+                        Meus Desafios
                     </h1>
-                    <p className="text-gray-400 text-sm">
-                        {activeChallenges} {activeChallenges === 1 ? 'desafio ativo' : 'desafios ativos'} | {accumulatedDays} dias acumulados
+                    <p className="text-sm" style={{ color: '#777777' }}>
+                        Continue sua jornada de 100 dias ✨
                     </p>
                 </div>
-                <button onClick={logout} className="p-2 rounded-full hover:bg-gray-800 transition-colors">
-                    <LogOut className="w-6 h-6 text-white" />
+                <button
+                    onClick={logout}
+                    className="w-8 h-8 rounded-full bg-gray-300 hover:bg-gray-400 transition-colors flex items-center justify-center"
+                    title={user?.displayName || 'Perfil'}
+                >
+                    <span className="text-gray-700 font-semibold text-sm">
+                        {user?.displayName?.charAt(0).toUpperCase() || 'U'}
+                    </span>
                 </button>
             </div>
 
@@ -199,7 +192,7 @@ const Dashboard: React.FC = () => {
                         <p className="text-gray-500 text-sm">Clique no botão + para criar seu primeiro desafio de 100 dias!</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-8 justify-items-center">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-6 justify-items-center">
                         {habits.map((habit) => (
                             <ProgressBubble
                                 key={habit.id}
