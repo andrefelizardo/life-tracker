@@ -34,8 +34,8 @@ export default function ProgressBubble({ habit, onClick, onLongPress }: Props) {
     const color = getColor();
 
     // SVG circle properties
-    const size = 140;
-    const strokeWidth = 8;
+    const size = 160;
+    const strokeWidth = 10;
     const radius = (size - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
     const strokeDashoffset = circumference - (progressPercent / 100) * circumference;
@@ -48,12 +48,47 @@ export default function ProgressBubble({ habit, onClick, onLongPress }: Props) {
         if (name.includes('exerc') || name.includes('gym')) return '💪';
         if (name.includes('ler') || name.includes('read')) return '📚';
         if (name.includes('inglês') || name.includes('english')) return '🇬🇧';
-        if (name.includes('álcool') || name.includes('alcohol')) return '🍺';
+        if (name.includes('álcool') || name.includes('alcohol')) return '🚫🍺';
+        if (name.includes('açúcar') || name.includes('sugar')) return '🚫🍬';
         if (name.includes('fumar') || name.includes('smoke')) return '🚭';
         if (name.includes('code') || name.includes('program')) return '💻';
         if (name.includes('sleep') || name.includes('dormir')) return '😴';
         return '⭐';
     };
+
+    // Get mode badge styling
+    const getModeBadge = () => {
+        if (habit.resetOnFailure) {
+            return {
+                text: '⚡ RESET',
+                bgColor: '#FFF7D1',
+                textColor: '#B8860B'
+            };
+        }
+
+        switch (habit.mode) {
+            case 'ON':
+                return {
+                    text: 'ON',
+                    bgColor: '#E6F7FF',
+                    textColor: '#1890FF'
+                };
+            case 'OFF':
+                return {
+                    text: 'OFF',
+                    bgColor: '#FFE8E8',
+                    textColor: '#FF4D4F'
+                };
+            default:
+                return {
+                    text: 'NORMAL',
+                    bgColor: '#F0F0F0',
+                    textColor: '#666666'
+                };
+        }
+    };
+
+    const modeBadge = getModeBadge();
 
     // Long press handlers
     const handleTouchStart = () => {
@@ -109,7 +144,7 @@ export default function ProgressBubble({ habit, onClick, onLongPress }: Props) {
 
     return (
         <div
-            className={`progress-bubble relative flex flex-col items-center justify-center cursor-pointer transition-transform duration-200 ${isPressed ? 'scale-95' : 'hover:scale-105'
+            className={`progress-bubble relative cursor-pointer transition-transform duration-200 ${isPressed ? 'scale-95' : 'hover:scale-105'
                 } ${isCompleted ? 'bubble-glow' : ''}`}
             onClick={onClick}
             onTouchStart={handleTouchStart}
@@ -117,16 +152,17 @@ export default function ProgressBubble({ habit, onClick, onLongPress }: Props) {
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseLeave}
+            style={{ width: size, height: size }}
         >
             {/* SVG Progress Circle */}
-            <svg width={size} height={size} className="transform -rotate-90 pointer-events-none">
+            <svg width={size} height={size} className="absolute inset-0 transform -rotate-90 pointer-events-none">
                 {/* Background circle */}
                 <circle
                     cx={size / 2}
                     cy={size / 2}
                     r={radius}
                     fill="none"
-                    stroke="rgba(255, 255, 255, 0.1)"
+                    stroke="#E6E6E6"
                     strokeWidth={strokeWidth}
                 />
                 {/* Progress circle */}
@@ -147,25 +183,36 @@ export default function ProgressBubble({ habit, onClick, onLongPress }: Props) {
                 />
             </svg>
 
-            {/* Content inside the bubble */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 pointer-events-none">
-                {/* Emoji */}
-                <div className="text-3xl mb-1">{getEmoji()}</div>
+            {/* Inner Circle with Content */}
+            <div
+                className="absolute inset-0 m-[10px] rounded-full bg-white flex flex-col items-center justify-center pointer-events-none"
+                style={{
+                    boxShadow: '0px 3px 6px rgba(0,0,0,0.08), 0px 1px 2px rgba(0,0,0,0.1)'
+                }}
+            >
+                {/* Habit Icon */}
+                <div className="text-3xl mb-2">{getEmoji()}</div>
 
                 {/* Habit Name */}
-                <p className="text-white font-bold text-sm mb-1 line-clamp-1 max-w-full">
+                <p className="text-sm font-medium mb-2 px-3 text-center truncate w-full" style={{ color: '#222222' }}>
                     {habit.name}
                 </p>
 
-                {/* Day Counter */}
-                <p className="text-white/80 text-xs font-medium">
-                    Dia {daysCompleted}/{totalDays}
+                {/* Numerical Progress */}
+                <p className="text-base font-semibold mb-3" style={{ color: '#444444' }}>
+                    {daysCompleted}/{totalDays}
                 </p>
 
-                {/* Reset Indicator */}
-                {habit.resetOnFailure && (
-                    <div className="absolute top-2 right-2 text-yellow-400 text-sm">⚡</div>
-                )}
+                {/* Mode Badge */}
+                <div
+                    className="px-3 py-1 rounded-full text-xs font-medium"
+                    style={{
+                        backgroundColor: modeBadge.bgColor,
+                        color: modeBadge.textColor
+                    }}
+                >
+                    {modeBadge.text}
+                </div>
 
                 {/* Completed Badge */}
                 {isCompleted && (
