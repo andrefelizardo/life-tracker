@@ -148,6 +148,7 @@ export default function HabitDetails({ habit, onIncrement, onFailure, onDelete, 
     const handleFailure = () => {
         onFailure(habit.id);
         setShowResetMessage(true);
+        if (messageTimer.current) clearTimeout(messageTimer.current);
         messageTimer.current = setTimeout(() => setShowResetMessage(false), 3000);
     };
 
