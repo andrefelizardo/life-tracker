@@ -12,23 +12,37 @@ datasource db {
 }
 
 model Habit {
-  id                Int       @id @default(autoincrement())
+  id                Int                @id @default(autoincrement())
   name              String
   qtt               Int
-  goal              Int       @default(0)
-  mode              String    @default("NORMAL") // "NORMAL", "ON", "OFF"
-  resetOnFailure    Boolean   @default(false)
-  startDate         DateTime? @default(now())
-  lastIncrementedAt DateTime? @default(now())
+  goal              Int                @default(0)
+  mode              String             @default("NORMAL") // "NORMAL", "ON", "OFF"
+  resetOnFailure    Boolean            @default(false)
+  startDate         DateTime?          @default(now())
+  lastIncrementedAt DateTime?          @default(now())
   userId            Int?
-  user              User?     @relation(fields: [userId], references: [id])
+  user              User?              @relation(fields: [userId], references: [id])
+  completions       HabitCompletion[]
+}
+
+model HabitCompletion {
+  id          Int      @id @default(autoincrement())
+  habitId     Int
+  habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  completedAt DateTime @default(now())
+  dayNumber   Int      // Which day of the 100-day challenge (1-100)
+  isFailure   Boolean  @default(false) // For OFF mode tracking
+  createdAt   DateTime @default(now())
+
+  @@unique([habitId, dayNumber])
+  @@index([habitId])
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  email String @unique
-  password String
-  displayName String
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  password       String
+  displayName    String
   profilePicture String?
-  habits Habit[]
+  habits         Habit[]
 }
